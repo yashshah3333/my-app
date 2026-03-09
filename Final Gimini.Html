@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechBugs System Directory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --bg: #09090b; /* Zinc 950 */
+      --surface: #18181b; /* Zinc 900 */
+      --surface-hover: #27272a; /* Zinc 800 */
+      --border: #27272a; 
+      --border-focus: #3f3f46;
+      --primary: #6366f1; /* Indigo 500 */
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --text: #f4f4f5; /* Zinc 50 */
+      --text-muted: #a1a1aa; /* Zinc 400 */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(39, 39, 42, 0.4) 0%, transparent 70%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Headers & Layout --- */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .title-row h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Buttons --- */
+    button {
+      font-family: var(--font);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-main {
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .btn-main:hover { background: var(--primary-hover); }
+
+    .btn-ghost, .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-ghost:hover, .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-focus);
+    }
+
+    /* --- Folder Navigation --- */
+    .folder-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .folder-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .folder-pill {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+
+    .folder-pill:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .folder-pill.active {
+      background: var(--surface-hover);
+      color: var(--text);
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .folder-pill.active::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .folder-actions { display: flex; gap: 8px; }
+
+    .btn-folder {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .btn-folder:hover {
+      color: var(--text);
+      background: var(--surface-hover);
+    }
+
+    .btn-folder.danger:hover {
+      color: white;
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* --- Forms --- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      background: #09090b;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    input::placeholder { color: #52525b; }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* --- Table & Search --- */
+    .table-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      width: 300px;
+      max-width: 100%;
+    }
+
+    .search-input-wrap input { padding-left: 36px; }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead { background: rgba(255, 255, 255, 0.02); }
+
+    th {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .cell-id { font-variant-numeric: tabular-nums; color: var(--text); }
+    .cell-pass { font-variant-numeric: tabular-nums; color: var(--text-muted); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .actions { display: flex; gap: 8px; }
+
+    .btn-xs {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .btn-xs:hover {
+      background: var(--surface-hover);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-xs.primary { color: var(--primary); }
+    .btn-xs.primary:hover { background: var(--primary-glow); border-color: var(--primary); }
+
+    .btn-xs.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .table-top { flex-direction: column; align-items: stretch; gap: 16px; }
+      .search-input-wrap { width: 100%; }
+      th, td { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="title-wrap">
+      <div class="title-row">
+        <h1>TechBugs Directory</h1>
+      </div>
+    </div>
+    <div class="app-actions">
+      <button type="button" class="btn-ghost" onclick="exportData()">
+        ↓ Export JSON
+      </button>
+      <button type="button" class="btn-main" onclick="focusNameField()">
+        + New client
+      </button>
+    </div>
+  </div>
+
+  <div class="folder-bar">
+    <div class="folder-pills" id="folderPills"></div>
+    <div class="folder-actions">
+      <button type="button" class="btn-folder" onclick="addFolder()">+ Folder</button>
+      <button type="button" class="btn-folder" onclick="renameFolder()">✎ Rename</button>
+      <button type="button" class="btn-folder danger" onclick="deleteFolder()">✕ Delete</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Client Details</div>
+      <div class="chip" id="modeTag">New entry</div>
+    </div>
+    <form id="addForm">
+      <div class="form-grid">
+        <div class="field">
+          <label class="label" for="name">Client name</label>
+          <input type="text" id="name" placeholder="Office-PC-Solapur">
+        </div>
+        <div class="field">
+          <label class="label" for="id">RustDesk ID</label>
+          <input type="text" id="id" placeholder="123 456 789">
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input type="text" id="password" placeholder="Client password">
+        </div>
+        <div class="field">
+          <label class="label" for="notes">Notes / Tag</label>
+          <input type="text" id="notes" placeholder="Win 10 · Shop PC">
+        </div>
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn-secondary" onclick="resetForm()">Clear</button>
+        <button type="submit" class="btn-main">Save Client</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Saved Endpoints</div>
+      <div class="chip" id="folderLabel">No folder selected</div>
+    </div>
+
+    <div class="table-top">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="searchBox" type="text" placeholder="Search clients or IDs..." oninput="renderTable()">
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="clientsTable">
+        <thead>
+        <tr>
+          <th style="width: 25%;">Client</th>
+          <th style="width: 20%;">ID</th>
+          <th style="width: 20%;">Password</th>
+          <th style="width: 20%;">Notes</th>
+          <th style="width: 15%;">Actions</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'rustdesk_clients_folders_v1';
+  let folders = [];
+  let currentFolderIndex = 0;
+  let editIndex = null;
+
+  function loadData() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        folders = JSON.parse(raw);
+      } catch (e) {
+        folders = [];
+      }
+    }
+    if (!Array.isArray(folders) || folders.length === 0) {
+      folders = [
+        { name: 'Workplace 1', clients: [] },
+        { name: 'Workplace 2', clients: [] }
+      ];
+    }
+    if (currentFolderIndex < 0 || currentFolderIndex >= folders.length) {
+      currentFolderIndex = 0;
+    }
+  }
+
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(folders));
+  }
+
+  function currentFolder() {
+    return folders[currentFolderIndex];
+  }
+
+  function renderFolders() {
+    const wrap = document.getElementById('folderPills');
+    wrap.innerHTML = '';
+    folders.forEach((f, idx) => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'folder-pill' + (idx === currentFolderIndex ? ' active' : '');
+      pill.onclick = () => {
+        currentFolderIndex = idx;
+        editIndex = null;
+        resetForm();
+        renderFolders();
+        renderTable();
+      };
+      pill.appendChild(document.createTextNode(f.name));
+      wrap.appendChild(pill);
+    });
+
+    const label = document.getElementById('folderLabel');
+    const cf = currentFolder();
+    label.textContent = cf ? cf.name : 'No folder selected';
+  }
+
+  function renderTable() {
+    const tbody = document.querySelector('#clientsTable tbody');
+    tbody.innerHTML = '';
+    const cf = currentFolder();
+    if (!cf) return;
+    const clients = cf.clients || [];
+
+    const qEl = document.getElementById('searchBox');
+    const q = qEl ? qEl.value.trim().toLowerCase() : '';
+
+    const filtered = !q ? clients : clients.filter(c => {
+      return (c.name && c.name.toLowerCase().includes(q)) ||
+             (c.id && c.id.toLowerCase().includes(q));
+    });
+
+    filtered.forEach(c => {
+      const index = clients.indexOf(c);
+      const tr = document.createElement('tr');
+
+      const tdName = document.createElement('td');
+      tdName.style.fontWeight = "500";
+      tdName.textContent = c.name;
+      tr.appendChild(tdName);
+
+      const tdId = document.createElement('td');
+      tdId.className = 'cell-id';
+      tdId.textContent = c.id;
+      tr.appendChild(tdId);
+
+      const tdPass = document.createElement('td');
+      tdPass.className = 'cell-pass';
+      const hiddenSpan = document.createElement('span');
+      hiddenSpan.className = 'hidden';
+      hiddenSpan.textContent = '••••••••';
+      const realSpan = document.createElement('span');
+      realSpan.className = 'real';
+      realSpan.textContent = c.password;
+      realSpan.style.display = 'none';
+      tdPass.appendChild(hiddenSpan);
+      tdPass.appendChild(realSpan);
+      tr.appendChild(tdPass);
+
+      const tdNotes = document.createElement('td');
+      if (c.notes) {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.appendChild(document.createTextNode(c.notes));
+        tdNotes.appendChild(tag);
+      } else {
+        tdNotes.textContent = '';
+      }
+      tr.appendChild(tdNotes);
+
+      const tdActions = document.createElement('td');
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const btnConnect = document.createElement('button');
+      btnConnect.className = 'btn-xs primary';
+      btnConnect.title = 'Connect';
+      btnConnect.innerHTML = '↗';
+      btnConnect.onclick = () => {
+        if (!c.id) return;
+        window.location.href = 'rustdesk://' + encodeURIComponent(c.id);
+      };
+      actions.appendChild(btnConnect);
+
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn-xs edit';
+      btnEdit.title = 'Edit';
+      btnEdit.innerHTML = '✎';
+      btnEdit.onclick = () => loadIntoForm(index);
+      actions.appendChild(btnEdit);
+
+      const btnEye = document.createElement('button');
+      btnEye.className = 'btn-xs eye';
+      btnEye.title = 'Show password';
+      btnEye.innerHTML = '👁';
+      btnEye.onmousedown = () => toggleRowPassword(tdPass, true);
+      btnEye.onmouseup = () => toggleRowPassword(tdPass, false);
+      btnEye.onmouseleave = () => toggleRowPassword(tdPass, false);
+      actions.appendChild(btnEye);
+
+      const realIdx = index;
+      const btnDel = document.createElement('button');
+      btnDel.className = 'btn-xs danger';
+      btnDel.title = 'Delete';
+      btnDel.innerHTML = '✕';
+      btnDel.onclick = () => {
+        if (!confirm(`Delete "${c.name || c.id}" from "${cf.name}"?`)) return;
+        const list = currentFolder().clients;
+        if (realIdx > -1 && realIdx < list.length) {
+          list.splice(realIdx, 1);
+          saveData();
+          if (editIndex === realIdx) resetForm();
+          renderTable();
+        }
+      };
+      actions.appendChild(btnDel);
+
+      tdActions.appendChild(actions);
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function loadIntoForm(index) {
+    const cf = currentFolder();
+    if (!cf) return;
+    const list = cf.clients || [];
+    const c = list[index];
+    if (!c) return;
+    editIndex = index;
+    document.getElementById('name').value = c.name;
+    document.getElementById('id').value = c.id;
+    document.getElementById('password').value = c.password;
+    document.getElementById('notes').value = c.notes || '';
+    document.getElementById('modeTag').textContent = 'Editing #' + (index + 1);
+    focusNameField();
+  }
+
+  document.getElementById('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const cf = currentFolder();
+    if (!cf) {
+      alert('Create a folder first.');
+      return;
+    }
+    const name = document.getElementById('name').value.trim();
+    const id = document.getElementById('id').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!name || !id) {
+      alert('Client name and ID are required');
+      return;
+    }
+
+    const list = cf.clients || [];
+    if (editIndex === null) {
+      list.push({ name, id, password, notes });
+    } else {
+      list[editIndex] = { name, id, password, notes };
+    }
+    cf.clients = list;
+    saveData();
+    resetForm();
+    renderTable();
+    focusNameField();
+  });
+
+  function resetForm() {
+    document.getElementById('name').value = '';
+    document.getElementById('id').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('notes').value = '';
+    editIndex = null;
+    document.getElementById('modeTag').textContent = 'New entry';
+  }
+
+  function focusNameField() {
+    document.getElementById('name').focus();
+  }
+
+  function exportData() {
+    const data = JSON.stringify(folders, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'techbugs-system-directory.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function toggleRowPassword(tdPass, show) {
+    const hidden = tdPass.querySelector('span.hidden');
+    const real = tdPass.querySelector('span.real');
+    if (!hidden || !real) return;
+    if (show) {
+      hidden.style.display = 'none';
+      real.style.display = 'inline';
+    } else {
+      hidden.style.display = 'inline';
+      real.style.display = 'none';
+    }
+  }
+
+  // Folder operations
+  function addFolder() {
+    const name = prompt('Folder name (e.g. Workplace A):');
+    if (!name) return;
+    folders.push({ name: name.trim(), clients: [] });
+    currentFolderIndex = folders.length - 1;
+    saveData();
+    resetForm();
+    renderFolders();
+    renderTable();
+  }
+
+  function renameFolder() {
+    const cf = currentFolder();
+    if (!cf) return;
+    const name = prompt('New name for folder:', cf.name);
+    if (!name) return;
+    cf.name = name.trim();
+    saveData();
+    renderFolders();
+    renderTable();
+  }
+
+  function deleteFolder() {
+    if (folders.length <= 1) {
+      alert('At least one folder is required.');
+      return;
+    }
+    const cf = currentFolder();
+    if (!cf) return;
+    if (!confirm(`Delete folder "${cf.name}" and all its clients?`)) return;
+    folders.splice(currentFolderIndex, 1);
+    if (currentFolderIndex >= folders.length) currentFolderIndex = folders.length - 1;
+    editIndex = null;
+    saveData();
+    resetForm();
+    renderFolders();
+    renderTable();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+      e.preventDefault();
+      focusNameField();
+    }
+  });
+
+  // Init
+  loadData();
+  renderFolders();
+  renderTable();
+</script>
+</body>
+</html>
