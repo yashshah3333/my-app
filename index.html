@@ -30,6 +30,40 @@
       --radius-full: 9999px;
     }
 
+    /* Light Theme Overrides */
+    body.light-mode {
+      --bg: #f8fafc; 
+      --surface: #ffffff; 
+      --surface-hover: #f1f5f9; 
+      --border: #e2e8f0; 
+      --border-focus: #cbd5e1;
+      --text: #0f172a; 
+      --text-muted: #64748b; 
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 70%),
+        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    }
+
+    body.light-mode .title-row h1 {
+      background: linear-gradient(135deg, #0f172a 0%, #64748b 100%);
+      -webkit-background-clip: text;
+    }
+
+    body.light-mode input[type="text"], 
+    body.light-mode input[type="password"] {
+      background: #ffffff;
+      color: #0f172a;
+    }
+    body.light-mode thead { background: rgba(0, 0, 0, 0.02); }
+    body.light-mode tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+    body.light-mode td { border-bottom: 1px solid rgba(0, 0, 0, 0.04); }
+    body.light-mode .chip, body.light-mode .tag { background: rgba(0, 0, 0, 0.04); border-color: var(--border); }
+    body.light-mode .folder-pill.active { background: #f1f5f9; }
+    body.light-mode .folder-pill:hover:not(.active) { background: rgba(0,0,0,0.03); }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -44,14 +78,42 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 40px 20px;
       -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* --- Login Overlay --- */
+    #loginOverlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
     }
 
     .app {
       width: 100%;
       max-width: 1000px;
-      display: flex;
+      display: flex; /* Hidden initially, controlled by JS */
       flex-direction: column;
       gap: 24px;
       animation: fadeIn 0.4s ease-out;
@@ -150,7 +212,7 @@
 
     .folder-pill:hover {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(128, 128, 128, 0.1);
     }
 
     .folder-pill.active {
@@ -170,12 +232,12 @@
       box-shadow: 0 0 8px var(--primary);
     }
 
-    .folder-actions { display: flex; gap: 8px; }
+    .folder-actions { display: flex; gap: 4px; }
 
     .btn-folder {
       background: transparent;
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
     }
@@ -222,7 +284,7 @@
       font-weight: 500;
       padding: 4px 10px;
       border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(128, 128, 128, 0.1);
       color: var(--text-muted);
       border: 1px solid var(--border);
     }
@@ -234,7 +296,7 @@
       gap: 16px;
     }
 
-    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field { display: flex; flex-direction: column; gap: 8px; text-align: left; }
 
     .label {
       font-size: 12px;
@@ -305,7 +367,7 @@
       text-align: left;
     }
 
-    thead { background: rgba(255, 255, 255, 0.02); }
+    thead { background: rgba(128, 128, 128, 0.05); }
 
     th {
       font-size: 12px;
@@ -318,12 +380,12 @@
     td {
       padding: 14px 16px;
       font-size: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(128, 128, 128, 0.1);
       vertical-align: middle;
     }
 
     tbody tr { transition: background 0.15s; }
-    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:hover { background: rgba(128, 128, 128, 0.05); }
     tbody tr:last-child td { border-bottom: none; }
 
     .cell-id { font-variant-numeric: tabular-nums; color: var(--text); }
@@ -336,15 +398,15 @@
       font-size: 12px;
       padding: 4px 10px;
       border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(128, 128, 128, 0.1);
       color: var(--text-muted);
     }
 
-    .actions { display: flex; gap: 8px; }
+    .actions { display: flex; gap: 4px; }
 
     .btn-xs {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       padding: 0;
       border-radius: var(--radius-sm);
       background: transparent;
@@ -361,8 +423,17 @@
 
     .btn-xs.primary { color: var(--primary); }
     .btn-xs.primary:hover { background: var(--primary-glow); border-color: var(--primary); }
-
     .btn-xs.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+
+    /* Footer */
+    .app-footer {
+      text-align: center;
+      padding: 24px 0 12px 0;
+      margin-top: auto;
+      color: var(--text-muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+    }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -373,7 +444,20 @@
   </style>
 </head>
 <body>
-<div class="app">
+
+<div id="loginOverlay">
+  <div class="login-box">
+    <h2 id="loginTitle" style="color: var(--text); font-size: 18px;">System Locked</h2>
+    <p id="setupMsg" style="font-size: 12px; color: var(--text-muted); display: none; margin-top: -8px;">Set up a new master password to secure your directory.</p>
+    <div class="field">
+      <input type="password" id="appPassword" placeholder="Enter password" onkeyup="if(event.key === 'Enter') checkPassword()">
+    </div>
+    <p id="loginError" style="color: var(--danger); font-size: 12px; display: none; margin-top: -8px;">Incorrect password.</p>
+    <button class="btn-main" onclick="checkPassword()" style="width: 100%; justify-content: center;">Unlock System</button>
+  </div>
+</div>
+
+<div class="app" id="mainApp" style="display: none;">
   <div class="app-header">
     <div class="title-wrap">
       <div class="title-row">
@@ -381,18 +465,18 @@
       </div>
     </div>
     <div class="app-actions">
-      <button type="button" class="btn-ghost" onclick="exportData()">
-        ↓ Export JSON
-      </button>
-      <button type="button" class="btn-main" onclick="focusNameField()">
-        + New client
-      </button>
+      <button type="button" class="btn-ghost" onclick="toggleTheme()">🌓 Theme</button>
+      <button type="button" class="btn-ghost" onclick="exportData()">↓ Export JSON</button>
+      <button type="button" class="btn-main" onclick="focusNameField()">+ New client</button>
     </div>
   </div>
 
   <div class="folder-bar">
     <div class="folder-pills" id="folderPills"></div>
     <div class="folder-actions">
+      <button type="button" class="btn-folder" onclick="moveFolder(-1)" title="Move Folder Left">◀</button>
+      <button type="button" class="btn-folder" onclick="moveFolder(1)" title="Move Folder Right">▶</button>
+      <span style="border-left: 1px solid var(--border); margin: 0 4px;"></span>
       <button type="button" class="btn-folder" onclick="addFolder()">+ Folder</button>
       <button type="button" class="btn-folder" onclick="renameFolder()">✎ Rename</button>
       <button type="button" class="btn-folder danger" onclick="deleteFolder()">✕ Delete</button>
@@ -458,14 +542,74 @@
       </table>
     </div>
   </div>
+
+  <footer class="app-footer">
+    App developed by Yash Shah (+91 9028800161) &bull; Software Version 1.0
+  </footer>
 </div>
 
 <script>
+  // --- Constants & State ---
   const STORAGE_KEY = 'rustdesk_clients_folders_v1';
+  const THEME_KEY = 'techbugs_theme';
+  const PASS_KEY = 'techbugs_app_pwd';
   let folders = [];
   let currentFolderIndex = 0;
   let editIndex = null;
 
+  // --- Theme Logic ---
+  if (localStorage.getItem(THEME_KEY) === 'light') {
+    document.body.classList.add('light-mode');
+  }
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem(THEME_KEY, document.body.classList.contains('light-mode') ? 'light' : 'dark');
+  }
+
+  // --- Password Logic ---
+  function initAuth() {
+    const savedPwd = localStorage.getItem(PASS_KEY);
+    if (!savedPwd) {
+      document.getElementById('setupMsg').style.display = 'block';
+      document.getElementById('loginTitle').innerText = 'Set App Password';
+    }
+    document.getElementById('appPassword').focus();
+  }
+
+  function checkPassword() {
+    const input = document.getElementById('appPassword').value;
+    const savedPwd = localStorage.getItem(PASS_KEY);
+    const errObj = document.getElementById('loginError');
+
+    if (!savedPwd) {
+      if (!input) {
+        errObj.innerText = "Password cannot be empty.";
+        errObj.style.display = 'block';
+        return;
+      }
+      // Simple base64 encoding to obfuscate in local storage
+      localStorage.setItem(PASS_KEY, btoa(input)); 
+      unlockApp();
+    } else {
+      if (btoa(input) === savedPwd) {
+        unlockApp();
+      } else {
+        errObj.innerText = "Incorrect password.";
+        errObj.style.display = 'block';
+      }
+    }
+  }
+
+  function unlockApp() {
+    document.getElementById('loginOverlay').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'flex';
+      focusNameField();
+    }, 300);
+  }
+
+  // --- App Logic ---
   function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -517,6 +661,22 @@
     label.textContent = cf ? cf.name : 'No folder selected';
   }
 
+  function moveFolder(direction) {
+    if (folders.length < 2) return;
+    const newIdx = currentFolderIndex + direction;
+    if (newIdx < 0 || newIdx >= folders.length) return;
+    
+    // Swap folders
+    const temp = folders[currentFolderIndex];
+    folders[currentFolderIndex] = folders[newIdx];
+    folders[newIdx] = temp;
+    
+    currentFolderIndex = newIdx;
+    saveData();
+    renderFolders();
+    renderTable();
+  }
+
   function renderTable() {
     const tbody = document.querySelector('#clientsTable tbody');
     tbody.innerHTML = '';
@@ -526,14 +686,15 @@
 
     const qEl = document.getElementById('searchBox');
     const q = qEl ? qEl.value.trim().toLowerCase() : '';
+    const isSearching = !!q;
 
-    const filtered = !q ? clients : clients.filter(c => {
+    const filtered = !isSearching ? clients : clients.filter(c => {
       return (c.name && c.name.toLowerCase().includes(q)) ||
              (c.id && c.id.toLowerCase().includes(q));
     });
 
-    filtered.forEach(c => {
-      const index = clients.indexOf(c);
+    filtered.forEach((c) => {
+      const realIdx = clients.indexOf(c);
       const tr = document.createElement('tr');
 
       const tdName = document.createElement('td');
@@ -585,14 +746,14 @@
       actions.appendChild(btnConnect);
 
       const btnEdit = document.createElement('button');
-      btnEdit.className = 'btn-xs edit';
+      btnEdit.className = 'btn-xs';
       btnEdit.title = 'Edit';
       btnEdit.innerHTML = '✎';
-      btnEdit.onclick = () => loadIntoForm(index);
+      btnEdit.onclick = () => loadIntoForm(realIdx);
       actions.appendChild(btnEdit);
 
       const btnEye = document.createElement('button');
-      btnEye.className = 'btn-xs eye';
+      btnEye.className = 'btn-xs';
       btnEye.title = 'Show password';
       btnEye.innerHTML = '👁';
       btnEye.onmousedown = () => toggleRowPassword(tdPass, true);
@@ -600,7 +761,23 @@
       btnEye.onmouseleave = () => toggleRowPassword(tdPass, false);
       actions.appendChild(btnEye);
 
-      const realIdx = index;
+      // Reorder buttons (only show if not currently searching)
+      if (!isSearching) {
+        const btnUp = document.createElement('button');
+        btnUp.className = 'btn-xs';
+        btnUp.title = 'Move Up';
+        btnUp.innerHTML = '↑';
+        btnUp.onclick = () => moveClient(realIdx, -1);
+        actions.appendChild(btnUp);
+
+        const btnDown = document.createElement('button');
+        btnDown.className = 'btn-xs';
+        btnDown.title = 'Move Down';
+        btnDown.innerHTML = '↓';
+        btnDown.onclick = () => moveClient(realIdx, 1);
+        actions.appendChild(btnDown);
+      }
+
       const btnDel = document.createElement('button');
       btnDel.className = 'btn-xs danger';
       btnDel.title = 'Delete';
@@ -622,6 +799,20 @@
 
       tbody.appendChild(tr);
     });
+  }
+
+  function moveClient(idx, dir) {
+    const list = currentFolder().clients;
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= list.length) return;
+    
+    // Swap clients
+    const temp = list[idx];
+    list[idx] = list[newIdx];
+    list[newIdx] = temp;
+    
+    saveData();
+    renderTable();
   }
 
   function loadIntoForm(index) {
@@ -754,6 +945,7 @@
   });
 
   // Init
+  initAuth();
   loadData();
   renderFolders();
   renderTable();
